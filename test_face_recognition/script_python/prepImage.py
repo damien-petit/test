@@ -82,6 +82,10 @@ def CropFace(image, eye_left=(0,0), eye_right=(0,0), offset_pct=(0.2,0.2), dest_
   return image
 
 if __name__ == "__main__":
-  image =  Image.open("francois-hollande1.jpg")
-  CropFace(image, eye_left=(140,120), eye_right=(195,117), offset_pct=(0.2,0.2), dest_sz=(200,200)).save("francois-hollande1_20_20_200_200.jpg")
+#  nbrImage = 52
+#  while i < nbrImage:
+#    imageFileName = "francois-hollande"+string(nbrImage)+".jpg"
+#    image =  Image.open(imageFileName)
+    image =  Image.open("francois-hollande1.jpg")
+    CropFace(image, eye_left=(140,120), eye_right=(195,117), offset_pct=(0.2,0.2), dest_sz=(200,200)).save("francois-hollande1_20_20_200_200.jpg")
 
