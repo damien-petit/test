@@ -31,7 +31,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import sys, math, Image
+import sys, math, Image, cv2
 
 def Distance(p1,p2):
   dx = p2[0] - p1[0]
@@ -81,7 +81,65 @@ def CropFace(image, eye_left=(0,0), eye_right=(0,0), offset_pct=(0.2,0.2), dest_
   image = image.resize(dest_sz, Image.ANTIALIAS)
   return image
 
-if __name__ == "__main__":
-  image =  Image.open("francois-hollande1.jpg.")
-  CropFace(image, eye_left=(140,120), eye_right=(195,117), offset_pct=(0.2,0.2), dest_sz=(200,200)).save("francois-hollande1_20_20_200_200.jpg")
+def LoadClassifier():
+  faceCascade = cv2.CascadeClassifier("./..haarcascade_frontalface_alt.xml")
+  eyeCascade = cv2.CascadeClassifier("./haarcascades/haarcascade_eye.xml")
+  return (faceCascade, eyeCascade)
 
+def DetectEyes(imageCV, faceCascade, eyeCascade):
+    minSize = (20,20)
+    imageScale = 2
+    haarScale = 1.2
+    minNeighbors = 2
+    haarFlags = 0
+
+    # Allocate the temporary images
+    #gray = cv2.CreateImage((imageCV.width, image.height), 8, 1)
+    #smallImage = cv.CreateImage((cv.Round(image.width / image_scale), cv2.Round (image.height / image_scale)), 8 ,1)
+
+    # Convert color input image to grayscale
+    cv2.cvtColor(image, gray, cv.CV_BGR2GRAY)
+
+    # Scale input image for faster processing
+    cv2.Resize(gray, smallImage, cv.CV_INTER_LINEAR)
+
+    # Equalize the histogram
+    cv2.EqualizeHist(smallImage, smallImage)
+
+    # Detect the faces
+    faces = cv2.HaarDetectObjects(smallImage, faceCascade, cv2.CreateMemStorage(0), haar_scale, min_neighbors, haar_flags, min_size)
+
+    # If faces are found
+    if faces:
+
+        for ((x, y, w, h), n) in faces:
+	# the input to cv.HaarDetectObjects was resized, so scale the
+        # bounding box of each face and convert it to two CvPoints
+            pt1 = (int(x * image_scale), int(y * image_scale))
+	    pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
+            cv2.Rectangle(image, pt1, pt2, cv2.RGB(255, 0, 0), 3, 8, 0)
+
+
+
+if __name__ == "__main__":
+#  nbrImage = 52
+#  while i < nbrImage:
+#    imageFileName = "francois-hollande"+string(nbrImage)+".jpg"
+#    image =  Image.open(imageFileName)
+
+    imageCV = cv2.imread("francois-hollande1.jpg")
+
+    faceCascade, eyeCascade = LoadClassifier()
+    image =  Image.open("francois-hollande1.jpg")
+    cv2.namedWindow("image-vip")
+    cv2.imshow("image-vip", imageCV)
+
+    DetectEyes(imageCV, faceCascade, eyeCascade)
+
+    cv2.waitKey(0)
+    cv2.destroyWindow("image-vip")
+    
+
+
+    CropFace(image, eye_left=(140,120), eye_right=(195,117), offset_pct=(0.2,0.2), dest_sz=(200,200)).save("francois-hollande1_20_20_200_200.jpg")
+ 
